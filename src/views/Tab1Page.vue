@@ -46,13 +46,23 @@
         <ion-button expand="block" class="ion-margin-top" @click="handleAddGame">
           Add Game
         </ion-button>
+
+        <h2 class="ion-margin-top">Your Games</h2>
+        <ion-list>
+          <ion-item v-for="game in games" :key="game.id">
+            <ion-label>
+              <h3>{{ game.title }}</h3>
+              <p>{{ game.platform }} — {{ game.status }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
       </div>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import {
   IonPage,
   IonHeader,
@@ -67,17 +77,29 @@ import {
   IonTextarea,
   IonButton,
   IonText,
+  IonList,
 } from '@ionic/vue'
-import { collection, addDoc, Timestamp } from 'firebase/firestore'
+import { collection, addDoc, Timestamp, query, where } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 import { db } from '@/firebase'
 import firebaseApp from '@/firebase'
+import { useCollection } from 'vuefire'
 
 const title = ref('')
 const platform = ref('')
 const status = ref<'backlog' | 'playing' | 'completed'>('backlog')
 const notes = ref('')
 const errorMessage = ref('')
+
+const auth = getAuth(firebaseApp)
+
+const gamesQuery = computed(() => {
+  const user = auth.currentUser
+  if (!user) return null
+  return query(collection(db, 'games'), where('userId', '==', user.uid))
+})
+
+const games = useCollection(gamesQuery)
 
 async function handleAddGame() {
   errorMessage.value = ''
@@ -87,7 +109,6 @@ async function handleAddGame() {
     return
   }
 
-  const auth = getAuth(firebaseApp)
   const user = auth.currentUser
 
   if (!user) {
