@@ -1,0 +1,7 @@
+{
+  "name": "game-backlog-manager",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
