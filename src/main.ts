@@ -4,6 +4,9 @@ import router from './router';
 
 import { IonicVue } from '@ionic/vue';
 
+import { VueFire, VueFireFirestoreOptionsAPI, VueFireAuthWithDependencies } from 'vuefire'
+import firebaseApp from './firebase'
+
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
 
@@ -36,7 +39,16 @@ import './theme/variables.css';
 
 const app = createApp(App)
   .use(IonicVue)
-  .use(router);
+  .use(router)
+  .use(VueFire, {
+    firebaseApp,
+    modules: [
+      VueFireFirestoreOptionsAPI(),
+      VueFireAuthWithDependencies({
+        dependencies: {},
+      }),
+    ],
+  });
 
 router.isReady().then(() => {
   app.mount('#app');
